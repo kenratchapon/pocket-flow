@@ -1,9 +1,18 @@
+"use client";
+
+import { useStoreModal } from "@/hooks/use-store-modal";
+import { useEffect, useState } from "react";
 
 
-export default function Home() {
-	return (
-		<div className="text-black font-bold text-xl">
-			สวัสดี
-		</div>
-	)
+export default function SetupPage() {
+  const onOpen = useStoreModal((state)=> state.onOpen);
+  const isOpen = useStoreModal((state)=> state.isOpen);
+  
+  useEffect(()=>{
+    if(!isOpen){
+      onOpen();
+    }
+  },[isOpen,onOpen])
+  
+  return null
 }
