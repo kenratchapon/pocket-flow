@@ -16,17 +16,21 @@ async function DashboardLayout({
         redirect('/sign-in')
     }
 
-    const {data} = await supabase.from('account').upsert({id: params})
-    if(data?.[0]){
+    const {data} = await supabase.from('account').select().eq('userId',userId)
+    if(!data?.[0]){
         redirect('/')
     }
 
-    return (
-      <div className='flex p-2 h-screen'>
-        <Sidebar/>
-        {children}
-      </div>
-    )
+        return (
+        <div className='flex p-2 h-screen bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ffffff] via-[#a0ffff] to-[#a85cff]'>
+            <Sidebar/>
+            <div className='bg-gray-700 w-full rounded-xl ml-2 p-2 bg-opacity-25'>
+                <div className='bg-white bg-opacity-90 w-full h-full rounded-md p-8'>
+                    {children}
+                </div>
+            </div>
+        </div>
+        )
 }
 
 export default DashboardLayout

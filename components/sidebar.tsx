@@ -41,7 +41,7 @@ const Sidebar = () => {
 
     return (
 		<div className={cn('h-full p-2 w-72 rounded-xl bg-gray-700 bg-opacity-25 relative duration-300',open? "w-72": "w-20")}>
-			<div className='bg-white h-full w-full rounded-md pt-8 pl-4 flex flex-col justify-between'>
+			<div className='bg-white bg-opacity-90 h-full w-full rounded-md pt-8 pl-4 flex flex-col justify-between'>
 				<ChevronLeft className={cn('absolute -right-3 top-10 bg-white rounded-xl border-4 h-7 w-7 border-gray-300 cursor-pointer',open? "rotate-0": "rotate-180")} onClick={()=>setOpen(!open)}/>
 				<div>
 					{/* Logo */}
