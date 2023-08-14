@@ -21,10 +21,35 @@ export async function PATCH(
         }
 
         if(!params.accountId){
-            return new NextResponse("Store id is required", {status: 400})
+            return new NextResponse("Account id is required", {status: 400})
         }
 
         const {data,error} = await supabase.from('account').update({name:name}).eq('id',params.accountId).select()
+
+        return NextResponse.json(data)
+
+    } catch (error) {
+        console.log('[STORE_PATCH]', error)
+        return new NextResponse("Interal error", {status:500})
+    }
+}
+
+export async function DELETE(
+    req: Request,
+    {params}: {params:{accountId:string}}
+) {
+    try {
+        const {userId} = auth();
+
+        if(!userId){
+            return new NextResponse("Unauthorized", {status: 401})
+        }
+
+        if(!params.accountId){
+            return new NextResponse("Account id is required", {status: 400})
+        }
+
+        const {data,error} = await supabase.from('account').delete().eq('id',params.accountId).select()
 
         return NextResponse.json(data)
 

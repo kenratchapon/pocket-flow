@@ -25,7 +25,7 @@ async function DashboardLayout({
         <div className='flex p-2 h-screen bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ffffff] via-[#a0ffff] to-[#a85cff]'>
             <Sidebar/>
             <div className='bg-gray-700 w-full rounded-xl ml-2 p-2 bg-opacity-25'>
-                <div className='bg-white bg-opacity-90 w-full h-full rounded-md p-8'>
+                <div className='bg-white bg-opacity-80 w-full h-full rounded-md p-8'>
                     {children}
                 </div>
             </div>

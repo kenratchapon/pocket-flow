@@ -50,7 +50,7 @@ const AccountModal = () => {
     return (
             <Modal 
                 title="Create Account" 
-                description="Put your first account name" 
+                description="Put your account name" 
                 isOpen={StoreModal.isOpen} 
                 onClose={StoreModal.onClose}
             >

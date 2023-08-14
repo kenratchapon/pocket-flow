@@ -1,15 +1,19 @@
 "use client"
 import { cn } from '@/lib/utils'
-import { ChevronLeft, KanbanSquare, List, Receipt, Settings, Wallet2 } from 'lucide-react'
-import React, { useState } from 'react'
+import { ChevronLeft, KanbanSquare, List, Receipt, Settings, User, Wallet2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { SignOutButton, UserButton } from '@clerk/nextjs'
+import AccountSwitcher from './account-switcher'
+import axios from 'axios'
+import { Account } from '@/types/collection'
 
 const Sidebar = () => {
 	const [open, setOpen] = useState(true)
 	const pathname = usePathname();
     const params = useParams();
+	const [account, setAccount] = useState<Account[]>([])
 	const routes = [
         {
             href: `/${params.accountId}`,
@@ -37,6 +41,19 @@ const Sidebar = () => {
         },
         
     ];
+	useEffect(() => {
+		fetchAccount()
+	}, [])
+	
+
+	const fetchAccount = async() =>{
+		try {
+			const response = await axios.get('/api/accounts')
+			setAccount(response.data)
+		} catch (error) {
+			console.log('error')
+		}
+	}
 
 
     return (
@@ -49,9 +66,14 @@ const Sidebar = () => {
 						<div className={cn('duration-500',!open && "rotate-[360deg]")}><Wallet2 className='h-8 w-8'/></div>
 						<h1 className={cn('text-black origin-left font-bold text-3xl duration-300',!open && "scale-0")}>PocketFlow</h1>
 					</div>
-					
 					{/* Nav Menu */}
 					<div className='flex flex-col pt-8 space-y-6 pl-1'>
+						<div className='flex gap-2 items-center text-muted-foreground' >
+							<div><User className='cursor-pointer' onClick={()=>setOpen(true)}/></div>
+							<div className={`origin-left duration-300 ${!open && "scale-0"}`}>
+								<AccountSwitcher data={account}/>
+							</div>
+						</div>
 						{routes.map((route)=>(
 							<Link 
 								key={route.href}

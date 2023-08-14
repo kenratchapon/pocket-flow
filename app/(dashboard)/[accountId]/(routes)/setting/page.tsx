@@ -19,14 +19,14 @@ const SettingPage: React.FC<SettingPageProps> = async ({
         redirect('/sign-in')
     }
 
-    const {data} = await supabase.from('account').select().eq('userId',userId)
-    if(!data?.[0]){
+    const {data} = await supabase.from('account').select().eq('id',params.accountId)
+    if(!data){
         redirect('/')
     }
 
     return (
         <div className='flex-col'>
-            <SettingForm initialData={data?.[0]}/>
+            <SettingForm initialData={data}/>
         </div>
     )
 }
