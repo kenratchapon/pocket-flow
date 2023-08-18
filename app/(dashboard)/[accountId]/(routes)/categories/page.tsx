@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 import CategoryClient from './components/client'
 import { CategoryColumn } from './components/column'
-
+export const revalidate = 0
 interface CategoriesPageProps {
     params: {
         accountId: string

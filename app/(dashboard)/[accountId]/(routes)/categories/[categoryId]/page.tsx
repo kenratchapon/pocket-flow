@@ -1,12 +1,18 @@
+import { supabase } from "@/lib/supabase"
+import CategoryForm from "./components/category-form"
 
 
-const CategoryPage = ({
+const CategoryPage = async ({
     params
 }:{
-    params: {accountId:string}
+    params: {accountId:string, categoryId: string}
 }) => {
+    const {data}= await supabase.from('category').select().eq('id',params.categoryId)
+
     return (
-        <div>page</div>
+        <div>
+            <CategoryForm initialData={data?.[0]}/>
+        </div>
     )
 }
 

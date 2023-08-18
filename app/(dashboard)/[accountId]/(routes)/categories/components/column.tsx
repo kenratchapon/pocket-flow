@@ -20,6 +20,10 @@ export const columns: ColumnDef<CategoryColumn>[] = [
         header: "Icon",
     },
     {
+        accessorKey: "activity",
+        header: "Activity",
+    },
+    {
         id: "actions",
         cell: ({row})=> <CellAction data={row.original}/>
       }
