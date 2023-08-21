@@ -1,6 +1,6 @@
 "use client"
 import { cn } from '@/lib/utils'
-import { AlignJustify, ChevronLeft, KanbanSquare, List, Receipt, Settings, User, Wallet2 } from 'lucide-react'
+import { ChevronLeft, KanbanSquare, List, Receipt, Settings, User, Wallet2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'

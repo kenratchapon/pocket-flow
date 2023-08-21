@@ -46,7 +46,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         defaultValues: initialData || {
             name: '',
             icon: '',
-            activity: '',
         }
     })
     
