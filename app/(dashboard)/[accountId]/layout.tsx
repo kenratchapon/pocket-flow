@@ -16,7 +16,7 @@ async function DashboardLayout({
         redirect('/sign-in')
     }
 
-    const {data} = await supabase.from('account').select().eq('userId',userId)
+    const {data} = await supabase.from('account').select().eq('id',params.accountId)
     if(!data?.[0]){
         redirect('/')
     }
