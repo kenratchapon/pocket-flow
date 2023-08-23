@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Heading } from '@/components/ui/heading'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as z from "zod"
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -17,12 +17,12 @@ import AlertMoadal from '@/components/modals/alert-modal'
 import { DateTime } from 'luxon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Label } from '@/components/ui/label'
 
 const formSchema = z.object({
-    amount: z.string().min(1),
+    amount: z.coerce.number(),
     category_id: z.string().min(1),
     memo: z.string().min(1),
     time: z.date({
@@ -55,6 +55,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         DateTime.fromJSDate(date)
     );
 
+    const [activity, setActivity] = useState(
+        initialData && initialData.category && initialData.category.activity
+            ? initialData.category.activity === 'Income'
+                ? 'Income'
+                : 'Expense'
+            : ''
+    );
+
     const form = useForm<TransactionFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
@@ -68,10 +76,49 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         }
     })
 
+    const onDelete = async () => {
+        try {
+            setLoading(true)
+            await axios.delete(`/api/${params.accountId}/transactions/${params.transactionId}`)
+            router.refresh()
+            router.push(`/${params.accountId}/transactions`)
+            toast.success("Transaction deleted.")
+        } catch (error) {
+            toast.error("Make sure you removed all product using this transaction first.")
+        } finally {
+            setLoading(false)
+            setOpen(false)
+        }
+    }
+
+    const modifiedDateTimeChange = (time: any) => {
+        const selectedDay = DateTime.fromJSDate(time);
+        const modifiedDay = selectedDay.set({
+            hour: selectedDateTime.hour,
+            minute: selectedDateTime.minute,
+        });
+        setSelectedDateTime(modifiedDay)
+        return modifiedDay.toJSDate()
+    }
+
+    const handleTimeChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+        const { value } = e.target;
+        const hours = Number.parseInt(value.split(':')[0] || '00', 10);
+        const minutes = Number.parseInt(value.split(':')[1] || '00', 10);
+        const modifiedDay = selectedDateTime.set({ hour: hours, minute: minutes });
+    
+        setDate(modifiedDay.toJSDate())
+        setSelectedDateTime(modifiedDay)
+    };
+    const formatTime = (dateTime: any) => {
+        const hours = String(dateTime.hour).padStart(2, '0');
+        const minutes = String(dateTime.minute).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
     const handleSubmit = async (data: TransactionFormValues) => {
-        handleSelect(data.time)
-        formatDateToCustomFormat(date)
-        data.time = date
+        const modified = modifiedDateTimeChange(data.time)
+        data.time = modified
         try {
             setLoading(true)
             console.log('data', data)
@@ -91,54 +138,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         }
     }
 
-    const onDelete = async () => {
-        try {
-            setLoading(true)
-            await axios.delete(`/api/${params.accountId}/transactions/${params.transactionId}`)
-            router.refresh()
-            router.push(`/${params.accountId}/transactions`)
-            toast.success("Transaction deleted.")
-        } catch (error) {
-            toast.error("Make sure you removed all product using this transaction first.")
-        } finally {
-            setLoading(false)
-            setOpen(false)
+    const handleClickActivity = (item: string) => {
+        if (item === 'Income') {
+            setActivity('Income')
+        } else if (item === 'Expense') {
+            setActivity('Expense')
         }
     }
 
-    function formatDateToCustomFormat(date: Date) {
-        const isoString = date.toISOString();
-        const year = isoString.slice(0, 4);
-        const month = isoString.slice(5, 7);
-        const day = isoString.slice(8, 10);
-        const time = isoString.slice(11, 23); // HH:mm:ss.ssssss
-        return `${year}-${month}-${day} ${time}+00`;
-    }
 
-    const handleSelect = (time: any) => {
-        const selectedDay = DateTime.fromJSDate(time);
-        const modifiedDay = selectedDay.set({
-            hour: selectedDateTime.hour,
-            minute: selectedDateTime.minute,
-        });
-
-        setSelectedDateTime(modifiedDay);
-        setDate(modifiedDay.toJSDate());
-    };
-    const handleTimeChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-        const { value } = e.target;
-        const hours = Number.parseInt(value.split(':')[0] || '00', 10);
-        const minutes = Number.parseInt(value.split(':')[1] || '00', 10);
-        const modifiedDay = selectedDateTime.set({ hour: hours, minute: minutes });
-
-        setSelectedDateTime(modifiedDay);
-        setDate(modifiedDay.toJSDate());
-    };
-    const formatTime = (dateTime: any) => {
-        const hours = String(dateTime.hour).padStart(2, '0');
-        const minutes = String(dateTime.minute).padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
     return (
         <>
             <AlertMoadal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
@@ -153,129 +161,156 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                     </Button>
                 )}
             </div>
-            <div className="flex flex-col mt-6">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 w-full md:w-1/3'>
-                        <div className='space-y-8'>
-                            <FormField
-                                control={form.control}
-                                name='amount'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Amount</FormLabel>
-                                        <FormControl>
-                                            <Input disabled={loading} placeholder="0.00฿" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='category_id'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <Select
-                                            disabled={loading}
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                            defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        defaultValue={field.value}
-                                                        placeholder='Select a category'
-                                                    />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {categories?.map((category) => (
-                                                    <SelectItem
-                                                        key={category.id}
-                                                        value={category.id + ""}
-                                                    >
-                                                        {category.name + " " + category.icon}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='memo'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Memo</FormLabel>
-                                        <FormControl>
-                                            <Input disabled={loading} placeholder="Note or Message" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className='flex flex-row gap-x-4 w-full'>
-                            <FormField
-                                control={form.control}
-                                name="time"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel>Date</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
+            <div className='flex flex-row justify-center relative max-w-2xl mx-auto'>
+                <div className='flex flex-row gap-4 justify-center items-end h-28 absolute z-10 text-white'>
+                    <button onClick={() => handleClickActivity('Income')} className={cn('flex justify-center items-start bg-green-600 w-32 md:w-48 h-16 rounded-xl duration-300', activity === 'Income' && 'h-20 text-lg')}>
+                        Income
+                    </button>
+                    <button onClick={() => handleClickActivity('Expense')} className={cn('flex justify-center items-start bg-red-600 w-32 md:w-48 h-16 rounded-xl duration-300', activity === 'Expense' && 'h-20 text-lg')}>
+                        <p>Expense</p>
+                    </button>
+                </div>
+                <div className='border-8 border-gray-300 p-4 mt-20 bg-white rounded-xl w-full z-20'>
+                    <div className="flex flex-col">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 w-full'>
+                                <div className='space-y-8'>
+                                    <FormField
+                                        control={form.control}
+                                        name='amount'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Amount</FormLabel>
                                                 <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            <>{format(new Date(field.value), "PPP")}</>
-                                                        ) : (
-                                                            <span>Pick a date</span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
+                                                    <Input disabled={loading} placeholder="0.00฿" {...field} />
                                                 </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date > new Date() || date < new Date("1900-01-01")
-                                                    }
-                                                    initialFocus
-                                                />
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name='category_id'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Category</FormLabel>
+                                                <Select
+                                                    disabled={loading}
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
+                                                    defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue
+                                                                defaultValue={field.value}
+                                                                placeholder='Select a category'
+                                                            />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {activity === 'Income' ? categories?.filter(category => category.activity === 'Income').map((category) => (
+                                                            <SelectItem
+                                                                key={category.id}
+                                                                value={category.id + ""}
+                                                            >
+                                                                {category.name + " " + category.icon}
+                                                            </SelectItem>
+                                                        )) : activity === 'Expense' ? categories?.filter(category => category.activity === 'Expense').map((category) => (
+                                                            <SelectItem
+                                                                key={category.id}
+                                                                value={category.id + ""}
+                                                            >
+                                                                {category.name + " " + category.icon}
+                                                            </SelectItem>
+                                                        )) :
+                                                            <SelectItem value={""}>Please select Income or Expense first</SelectItem>
+                                                        }
 
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div>
-                                <Label>Time</Label>
-                                <Input
-                                    type="time"
-                                    onChange={handleTimeChange}
-                                    value={formatTime(selectedDateTime)}
-                                />
-                            </div>
-                            </div>
-                        </div>
-                        <Button disabled={loading} className='ml-auto' type='submit'>
-                            {action}
-                        </Button>
-                    </form>
-                </Form>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name='memo'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Memo</FormLabel>
+                                                <FormControl>
+                                                    <Input disabled={loading} placeholder="Note or Message" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div className='flex flex-row gap-x-4 w-full'>
+                                        <FormField
+                                            control={form.control}
+                                            name="time"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>Date</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={cn(
+                                                                        "w-[240px] pl-3 text-left font-normal",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        <>{format(new Date(field.value), "PPP")}</>
+                                                                    ) : (
+                                                                        <span>Pick a date</span>
+                                                                    )}
+                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                disabled={(date) =>
+                                                                    date > new Date() || date < new Date("1900-01-01")
+                                                                }
+                                                                initialFocus
+                                                            />
+
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div>
+                                            <Label>Time</Label>
+                                            <Input
+                                                type="time"
+                                                onChange={handleTimeChange}
+                                                value={formatTime(selectedDateTime)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='flex flex-row justify-center'>
+                                    <Button disabled={loading} className='w-40' type='submit'>
+                                        {action}
+                                    </Button>
+                                </div>
+
+                            </form>
+                        </Form>
+                    </div>
+                </div>
             </div>
+
+
         </>
 
     )

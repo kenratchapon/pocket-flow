@@ -4,7 +4,7 @@ import { Heading } from '@/components/ui/heading'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'
 import * as z from "zod"
-import {useForm} from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from 'react-hot-toast'
@@ -48,22 +48,22 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             icon: '',
         }
     })
-    
-    const handleSubmit = async (data: CategoryFormValues)=>{
+
+    const handleSubmit = async (data: CategoryFormValues) => {
         try {
             setLoading(true)
-            if(initialData){
-                await axios.patch(`/api/${params.accountId}/categories/${params.categoryId}`,data)
-            }else{
-                await axios.post(`/api/${params.accountId}/categories`,data)
+            if (initialData) {
+                await axios.patch(`/api/${params.accountId}/categories/${params.categoryId}`, data)
+            } else {
+                await axios.post(`/api/${params.accountId}/categories`, data)
             }
-            
+
             router.refresh();
             router.push(`/${params.accountId}/categories`)
             toast.success(toastMessage)
         } catch (error) {
             toast.error("Something went wrong")
-        } finally{
+        } finally {
             setLoading(false)
         }
     }
@@ -85,63 +85,65 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
     return (
         <>
-            <AlertMoadal isOpen={open} onClose={()=>setOpen(false)} onConfirm={onDelete} loading={loading}/>
+            <AlertMoadal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
             <div className='flex items-center justify-between'>
                 <Heading
                     title={title}
                     description={description}
                 />
-                {initialData &&(
-                    <Button disabled={loading} variant="destructive" size="sm" onClick={()=>setOpen(true)}>
-                        <Trash className='h-4 w-4'/>
+                {initialData && (
+                    <Button disabled={loading} variant="destructive" size="sm" onClick={() => setOpen(true)}>
+                        <Trash className='h-4 w-4' />
                     </Button>
                 )}
             </div>
-            <div className="flex flex-col mt-6">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 w-full'>
-                        <div className='grid grid-cols-3 gap-8'>
-                            <FormField
-                                control={form.control}
-                                name='name'
-                                render={({field})=>(
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
-                                        <FormControl>
-                                            <Input disabled={loading} placeholder="Category name" {...field}/>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='icon'
-                                render={({field})=>(
-                                    <FormItem>
-                                        <FormLabel>Icon</FormLabel>
-                                        <FormControl>
-                                            <Input disabled={loading} placeholder="Icon" {...field}/>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='activity'
-                                render={({field})=>(
-                                    <FormItem>
-                                        <FormLabel>Activity</FormLabel>
-                                        <Select 
-                                            disabled={loading} 
-                                            onValueChange={field.onChange} 
-                                            value={field.value} 
-                                            defaultValue={field.value}
-                                        >
+            <div className='flex flex-row justify-center relative max-w-2xl mx-auto'>
+            <div className='border-8 border-gray-300 p-4 mt-20 bg-white rounded-xl w-full z-20'>
+                <div className="flex flex-col mt-6">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 w-full'>
+                            <div className='space-y-8'>
+                                <FormField
+                                    control={form.control}
+                                    name='name'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+                                            <FormControl>
+                                                <Input disabled={loading} placeholder="Category name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name='icon'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Icon</FormLabel>
+                                            <FormControl>
+                                                <Input disabled={loading} placeholder="Icon" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name='activity'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Activity</FormLabel>
+                                            <Select
+                                                disabled={loading}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                defaultValue={field.value}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue   
+                                                        <SelectValue
                                                             defaultValue={field.value}
                                                             placeholder='Select an activity'
                                                         />
@@ -151,18 +153,21 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                                                     <SelectItem key={1} value={'Income'}>Income</SelectItem>
                                                     <SelectItem key={2} value={'Expense'}>Expense</SelectItem>
                                                 </SelectContent>
-                                        </Select>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <Button disabled={loading} className='ml-auto' type='submit'>
-                            {action}
-                        </Button>
-                    </form>
-                </Form>
-			</div>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className='flex flex-row justify-center'>
+                                    <Button disabled={loading} className='w-40' type='submit'>
+                                        {action}
+                                    </Button>
+                                </div>
+                        </form>
+                    </Form>
+                </div></div></div>
+
         </>
 
     )
