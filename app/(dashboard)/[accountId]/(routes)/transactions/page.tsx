@@ -29,7 +29,8 @@ const TransactionsPage: React.FC<TransactionsPageProps> = async ({
             category: item.category.icon + item.category.name,
             memo: item.memo,
             amount: item.amount,
-            time: format(dateObject, "MMMM d, yyyy 'at' HH:mm:ss z")
+            activity: item.category.activity,
+            time: format(dateObject, "MMMM d, yyyy 'at' HH:mm z")
     }
     })
 
