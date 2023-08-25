@@ -2,6 +2,32 @@ import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
+export async function GET(req:Request,{params}: {params:{accountId:string}}) {
+    try{
+        const {userId} = auth();
+
+        if(!userId){
+            return new NextResponse("Unauthorized", {status: 401})
+        }
+
+        if(!params.accountId){
+            return new NextResponse("Account id is required", {status: 400})
+        }
+        
+        const { data, error } = await supabase.from('transaction').select().eq('account_id',params.accountId)
+
+        if(error){
+            console.log('error', error)
+            return new NextResponse("insert transaction error", {status: 400})
+        }
+
+        return NextResponse.json(data)
+
+    } catch (error) {
+        console.log('[TRANSACTION_GET]', error)
+        return new NextResponse("Interal error", {status:500})
+    }
+}
 export async function POST(req:Request,{params}: {params:{accountId:string}}) {
     try{
         const {userId} = auth();
