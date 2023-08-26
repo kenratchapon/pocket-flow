@@ -7,7 +7,7 @@ interface GraphLineChartProps {
     graphData2: any[];
 }
 
-export const GraphLineChart: React.FC<GraphLineChartProps> = ({
+export const GraphBarChart: React.FC<GraphLineChartProps> = ({
     graphData1,
     graphData2
 }) =>{

@@ -44,6 +44,6 @@ export const getTransactionIncomeByMonth = async (accountId: string): Promise<Gr
     name: (day + 1).toString(),
     total: dailyBalance[day + 1] || 0,
   }));
-
+  
   return graphData;
 };
