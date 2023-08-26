@@ -21,6 +21,7 @@ const TransactionsPage: React.FC<TransactionsPageProps> = async ({
     if(!data){
         redirect('/')
     }
+    
     const formattedTransactions: TransactionColumn[] = data.map((item)=>{
         const timestamp = item.time;
         const dateObject = parseISO(timestamp);

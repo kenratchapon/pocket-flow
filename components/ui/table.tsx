@@ -1,7 +1,18 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+export type PaginationState = {
+  pageIndex: number
+  pageSize: number
+}
 
+export type PaginationTableState = {
+  pagination: PaginationState
+}
+
+export type PaginationInitialTableState = {
+  pagination?: Partial<PaginationState>
+}
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
