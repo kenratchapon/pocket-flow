@@ -14,6 +14,7 @@ import React from 'react'
 import { DashboardTransactionColumn } from './components/column'
 import { format, parseISO } from 'date-fns'
 import DashBoardTransactionClient from './components/client'
+import { DashboardAI } from '@/components/ui/dashboard-ai-recommend'
 export const revalidate = 0
 interface DashboardPageProps {
     params: { accountId: string }
@@ -70,11 +71,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
                             <DashboardAccountBalance title='Account Balance' data={accountBalance}/>
                         </div>
                         <div className='rounded-xl bg-white shadow-xl row-span-3 col-span-3'>
-                            AI Recommend
+                            <DashboardAI title='AI recommend' dataIncome={transactionIncomeByMonth} dataExpense={transactionExpenseByMonth}/>
                         </div>
                     </div>
                     <div className='grid grid-rows-6 col-span-4 mt-4 lg:mt-0'>
-                        <div className='rounded-xl bg-white shadow-xl row-span-6'>
+                        <div className='rounded-xl bg-white shadow-xl row-span-6 overflow-auto'>
                             <DashBoardTransactionClient data={formattedTransactions}/>
                         </div>
                     </div>
