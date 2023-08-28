@@ -33,7 +33,7 @@ const formSchema = z.object({
 type TransactionFormValues = z.infer<typeof formSchema>
 
 interface TransactionFormProps {
-    initialData: Transaction
+    initialData: any
     categories: Category[] | null
 }
 
@@ -67,7 +67,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
             ...initialData,
-            amount: initialData.amount.toString(),
+            amount: initialData.amount,
             category_id: initialData.category_id + "",
             time: new Date(initialData.time)
         } : {

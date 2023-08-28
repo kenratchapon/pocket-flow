@@ -43,9 +43,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
     const form = useForm<CategoryFormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: initialData || {
-            name: '',
-            icon: '',
+        defaultValues: {
+            name: initialData.name || '',
+            icon: initialData.icon || '',
+            activity: initialData.activity || '', 
         }
     })
 
