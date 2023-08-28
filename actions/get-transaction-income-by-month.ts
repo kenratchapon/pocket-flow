@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 interface GraphData {
   name: string;
   total: number;
+  category: string;
 }
 
 const getDaysInMonth = (year: number, month: number): number => {
@@ -28,22 +29,29 @@ export const getTransactionIncomeByMonth = async (accountId: string): Promise<Gr
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
 
-  const dailyBalance: { [key: number]: number } = {};
+  const dailyBalance: { [key: number]: { total: number; category: string } } = {};
 
   transactions?.forEach((item) => {
     if (item.category.activity === 'Income') {
       const d = new Date(item.time);
       const day = d.getDate();
       const balanceForTransaction = item.amount;
+      const category = item.category.name;
 
-      dailyBalance[day] = (dailyBalance[day] || 0) + balanceForTransaction;
+      if (!dailyBalance[day]) {
+        dailyBalance[day] = { total: 0, category: '' };
+      }
+
+      dailyBalance[day].total += balanceForTransaction;
+      dailyBalance[day].category = category;
     }
   });
 
   const graphData: GraphData[] = Array.from({ length: daysInMonth }, (_, day) => ({
     name: (day + 1).toString(),
-    total: dailyBalance[day + 1] || 0,
+    total: dailyBalance[day + 1]?.total || 0,
+    category: dailyBalance[day + 1]?.category || '',
   }));
-  
+
   return graphData;
 };
