@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase"
 import CategoryForm from "./components/category-form"
-
+export const revalidate = 0
 
 const CategoryPage = async ({
     params

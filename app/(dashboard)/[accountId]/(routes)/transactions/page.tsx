@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import { redirect } from 'next/navigation'
 import React from 'react'
-import CategoryClient from './components/client'
 import { TransactionColumn } from './components/column'
+import TransactionClient from './components/client'
 const { parseISO, format } = require('date-fns');
 export const revalidate = 0
 interface TransactionsPageProps {
@@ -16,7 +16,7 @@ const TransactionsPage: React.FC<TransactionsPageProps> = async ({
 }) => {
     const {data,error} = await supabase.from('transaction').select('*,category(*)').eq('account_id',params.accountId).order('time', { ascending: false })
     if(error){
-        console.log('category error')
+        console.log('transaction error')
     }
     if(!data){
         redirect('/')
@@ -37,7 +37,7 @@ const TransactionsPage: React.FC<TransactionsPageProps> = async ({
 
     return (
         <div className='flex-col'>
-            <CategoryClient data={formattedTransactions}/>
+            <TransactionClient data={formattedTransactions}/>
         </div>
     )
 }

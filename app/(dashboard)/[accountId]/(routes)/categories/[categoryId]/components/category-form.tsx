@@ -12,7 +12,6 @@ import axios from 'axios'
 import { useParams, useRouter } from 'next/navigation'
 import { Category } from '@/types/collection'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import Picker from 'emoji-picker-react'
 import { Trash } from 'lucide-react'
 import AlertMoadal from '@/components/modals/alert-modal'
 
@@ -43,10 +42,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
     const form = useForm<CategoryFormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: initialData.name || '',
-            icon: initialData.icon || '',
-            activity: initialData.activity || '', 
+        defaultValues: initialData || {
+            name: '',
+            icon: '',
+            activity: '', 
         }
     })
 
