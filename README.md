@@ -1,10 +1,12 @@
 # Pocket Flow 
 
-## Full stack web develop using Nextjs + PostgreSQL(supabase)
+## Full stack web application using Nextjs13, TypeScript, TailwindCSS + PostgreSQL(supabase) + integrate with OpenAI
 
 ![image](https://github.com/kenratchapon/pocket-flow/assets/134255219/d173cf39-e59a-45fe-9a75-c9387df074ae)
 
 (https://pocket-flow.vercel.app)
+
+Test Accout username: testAccount passwaord: Testaccount@01
 
 "Pocket Flow" is a comprehensive financial management application designed to empower users with effective tools for managing their finances.
 
@@ -23,7 +25,7 @@ Welcome to Pocket Flow, your ultimate financial management solution! This guide 
 
 To begin using Pocket Flow on the web, simply visit [pocket-flow.vercel.app](https://pocket-flow.vercel.app) in your web browser.
 
-*Account Setup*: Launch the app and follow the on-screen instructions to set up your account.
+*Account Setup*: Launch the app can sign-up account with Facebook, Github, Google ,or email. 
 
 ## Creating Categories
 
