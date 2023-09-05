@@ -11,7 +11,7 @@ export default async function SetupLayout({children}:{children:React.ReactNode})
         redirect('/sign-in')
     }
 
-    const {data} = await supabase.from('account').select()
+    const {data} = await supabase.from('account').select().eq('userId',userId)
     if(data?.[0]){
         redirect(`/${data?.[0].id}`)
     }

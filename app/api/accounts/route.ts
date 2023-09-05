@@ -11,7 +11,7 @@ export async function GET(req:Request) {
             return new NextResponse("Unauthorized", {status: 401})
         }
         
-        const { data, error } = await supabase.from('account').select('*')
+        const { data, error } = await supabase.from('account').select('*').eq('userId',userId)
 
         if(error){
             return new NextResponse("insert account name error", {status: 400})
